@@ -1,0 +1,193 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-nestle-red: var(--nestle-red);
+  --color-nestle-blue: var(--nestle-blue);
+  --color-nestle-green: var(--nestle-green);
+  --color-nestle-yellow: var(--nestle-yellow);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+}
+
+:root {
+  --radius: 0.5rem;
+  --background: oklch(0.975 0.012 85);
+  --foreground: oklch(0.22 0.02 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.02 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.02 260);
+  --primary: oklch(0.55 0.22 27);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.008 85);
+  --secondary-foreground: oklch(0.22 0.02 260);
+  --muted: oklch(0.94 0.006 85);
+  --muted-foreground: oklch(0.5 0.015 260);
+  --accent: oklch(0.92 0.012 85);
+  --accent-foreground: oklch(0.22 0.02 260);
+  --destructive: oklch(0.58 0.23 27);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.9 0.008 85);
+  --input: oklch(0.92 0.008 85);
+  --ring: oklch(0.55 0.22 27);
+
+  --nestle-red: oklch(0.55 0.22 27);
+  --nestle-blue: oklch(0.5 0.18 250);
+  --nestle-green: oklch(0.62 0.16 150);
+  --nestle-yellow: oklch(0.82 0.16 90);
+  --success: oklch(0.62 0.16 150);
+  --warning: oklch(0.78 0.16 75);
+  --info: oklch(0.6 0.16 235);
+
+  --sidebar: oklch(0.18 0.02 260);
+  --sidebar-foreground: oklch(0.85 0.01 260);
+  --sidebar-accent: oklch(0.25 0.03 260);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.28 0.02 260);
+}
+
+.dark {
+  --background: oklch(0.18 0.02 260);
+  --foreground: oklch(0.95 0 0);
+  --card: oklch(0.22 0.02 260);
+  --card-foreground: oklch(0.95 0 0);
+  --popover: oklch(0.22 0.02 260);
+  --popover-foreground: oklch(0.95 0 0);
+  --primary: oklch(0.6 0.22 27);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.28 0.02 260);
+  --secondary-foreground: oklch(0.95 0 0);
+  --muted: oklch(0.28 0.02 260);
+  --muted-foreground: oklch(0.7 0.015 260);
+  --accent: oklch(0.3 0.03 260);
+  --accent-foreground: oklch(0.95 0 0);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  .app-table-head {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in oklch, var(--card) 92%, transparent);
+    backdrop-filter: blur(6px);
+  }
+
+  .app-table-th {
+    padding: 0.625rem 1rem;
+    text-align: left;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted-foreground);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .app-table-td {
+    padding: 0.625rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+  }
+
+  .app-table-row {
+    transition: background-color 0.15s ease;
+  }
+
+  .app-table-row:hover {
+    background-color: color-mix(in oklch, var(--muted) 55%, transparent);
+  }
+
+  .app-table-body tr:last-child .app-table-td {
+    border-bottom: none;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .nav-item-active {
+    background-color: var(--nestle-red);
+    color: white;
+    box-shadow: 0 1px 3px oklch(0.55 0.22 27 / 0.35);
+  }
+
+  .nav-item-inactive {
+    color: color-mix(in oklch, var(--sidebar-foreground) 85%, transparent);
+  }
+
+  .nav-item-inactive:hover {
+    background-color: var(--sidebar-accent);
+    color: var(--sidebar-accent-foreground);
+  }
+
+  .topbar-select {
+    height: 2.25rem;
+    min-width: 13.75rem;
+    padding: 0 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--input);
+    background: var(--background);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .topbar-select:focus {
+    outline: none;
+    border-color: var(--nestle-red);
+    box-shadow: 0 0 0 3px oklch(0.55 0.22 27 / 0.15);
+  }
+}
