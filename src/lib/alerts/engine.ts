@@ -1,22 +1,15 @@
-import { getAllSkuChannelContexts } from "@/lib/mockData";
-import type { SkuChannelPlanningContext } from "@/lib/mockData";
-import {
-  buildCleaningSummary,
-  buildDemandPointsForSku,
-  detectOutliers,
-  evaluateCleaningAlerts,
-  getSkuCleaning,
-} from "@/lib/cleaning";
+import { evaluateCleaningAlerts } from "@/lib/cleaning/alerts";
+import { buildCleaningSummary } from "@/lib/cleaning/build";
+import { detectOutliers } from "@/lib/cleaning/detect";
+import { buildDemandPointsForSku } from "@/lib/cleaning/series";
+import { getSkuCleaning } from "@/lib/cleaning/store";
+import { buildFinancialDashboard } from "@/lib/financial/build";
+import { getFinancialSimulationParams } from "@/lib/financial/store";
 import { DEMO_PRODUCTS } from "@/lib/mockData/catalog";
-import {
-  buildFinancialDashboard,
-  getFinancialSimulationParams,
-} from "@/lib/financial";
-import {
-  DEFAULT_THRESHOLDS,
-  evaluateContext,
-  resetAlertIdCounter,
-} from "./rules";
+import { getAllSkuChannelContexts } from "@/lib/mockData/datasets";
+import type { SkuChannelPlanningContext } from "@/lib/mockData/types";
+import { buildAllSupplyData, evaluateSupplyAlerts } from "@/lib/supply";
+import { DEFAULT_THRESHOLDS, evaluateContext, resetAlertIdCounter } from "./rules";
 import type { Alert, AlertSeverity, AlertType, EvaluateAlertsOptions } from "./types";
 
 export interface AlertEngineResult {
@@ -36,27 +29,31 @@ export function evaluateAlerts(
 
   const thresholds = { ...DEFAULT_THRESHOLDS, ...options?.thresholds };
   const source = contexts ?? getAllSkuChannelContexts();
+  const skuFilter = contexts ? new Set(source.map((ctx) => ctx.product.code)) : null;
 
   const planningAlerts = source
     .flatMap((ctx) => evaluateContext(ctx, thresholds))
     .filter((a) => options?.includeResolved || a.status === "open");
 
-  const financialAlerts = buildFinancialDashboard(
-    getFinancialSimulationParams(),
-  ).alerts;
+  const financialAlerts = buildFinancialDashboard(getFinancialSimulationParams()).alerts.filter(
+    (a) => !skuFilter || skuFilter.has(a.skuCode),
+  );
 
-  const cleaningAlerts = DEMO_PRODUCTS.flatMap((p) => {
-    const stored = getSkuCleaning(p.code);
-    const threshold = stored?.threshold ?? 3;
-    const rows =
-      stored?.rows ??
-      detectOutliers(buildDemandPointsForSku(p.code), threshold);
-    const summary = buildCleaningSummary(rows);
-    return evaluateCleaningAlerts(p.code, p.name, rows, summary);
-  });
+  const cleaningAlerts = DEMO_PRODUCTS.filter((p) => !skuFilter || skuFilter.has(p.code)).flatMap(
+    (p) => {
+      const stored = getSkuCleaning(p.code);
+      const threshold = stored?.threshold ?? 3;
+      const rows = stored?.rows ?? detectOutliers(buildDemandPointsForSku(p.code), threshold);
+      const summary = buildCleaningSummary(rows);
+      return evaluateCleaningAlerts(p.code, p.name, rows, summary);
+    },
+  );
+
+  const supplyRows = buildAllSupplyData().filter((row) => !skuFilter || skuFilter.has(row.skuCode));
+  const supplyAlerts = evaluateSupplyAlerts(supplyRows);
 
   const seen = new Set<string>();
-  const alerts = [...planningAlerts, ...financialAlerts, ...cleaningAlerts]
+  const alerts = [...planningAlerts, ...financialAlerts, ...cleaningAlerts, ...supplyAlerts]
     .filter((a) => {
       const key = `${a.type}:${a.skuCode}:${a.channel}`;
       if (seen.has(key)) return false;
@@ -74,9 +71,7 @@ export function evaluateAlerts(
 
 /** Evalúa alertas para un SKU en todos sus canales */
 export function evaluateAlertsForSku(skuCode: string): AlertEngineResult {
-  const contexts = getAllSkuChannelContexts().filter(
-    (c) => c.product.code === skuCode,
-  );
+  const contexts = getAllSkuChannelContexts().filter((c) => c.product.code === skuCode);
   return evaluateAlerts(contexts);
 }
 

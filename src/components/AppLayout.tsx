@@ -3,9 +3,22 @@ import { useAuth } from "@/lib/auth";
 import { useProduct } from "@/lib/product-context";
 import { PRODUCTS } from "@/lib/mock-data";
 import {
-  LayoutDashboard, Crown, Database, Sparkles, LineChart, Lightbulb,
-  Handshake, ShieldAlert, DollarSign, CalendarDays, Bot, Users, Lock,
-  LogOut, Brush, Bell,
+  LayoutDashboard,
+  Crown,
+  Database,
+  LineChart,
+  Lightbulb,
+  Handshake,
+  ShieldAlert,
+  DollarSign,
+  CalendarDays,
+  Bot,
+  Users,
+  Lock,
+  LogOut,
+  Brush,
+  Bell,
+  Factory,
 } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { evaluateAlerts, filterAlerts } from "@/lib/alerts";
@@ -19,6 +32,7 @@ const NAV = [
   { key: "forecast", to: "/app/forecast", label: "Forecast", icon: LineChart },
   { key: "insights", to: "/app/insights", label: "Insights", icon: Lightbulb },
   { key: "consenso", to: "/app/consenso", label: "Consenso", icon: Handshake },
+  { key: "suministro", to: "/app/suministro", label: "Suministro", icon: Factory },
   { key: "control-tower", to: "/app/control-tower", label: "Alertas", icon: ShieldAlert },
   { key: "finanzas", to: "/app/finanzas", label: "Finanzas", icon: DollarSign },
   { key: "mbp", to: "/app/mbp", label: "MBP", icon: CalendarDays },

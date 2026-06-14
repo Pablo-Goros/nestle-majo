@@ -15,6 +15,9 @@ export const ALERT_TYPE_LABELS: Record<AlertType, string> = {
   cleaning_high_outlier_ratio: "Outliers >10% de la serie",
   cleaning_coyuntural_baseline: "Coyuntural afecta baseline",
   cleaning_unexplained_drop: "Caída abrupta sin explicar",
+  supply_capacity_gap: "Capacidad productiva insuficiente",
+  supply_supermarket_stock_shortage: "Stock insuficiente supermercados",
+  supply_critical_stockout_risk: "Riesgo alto de quiebre",
 };
 
 export const ALERT_STATUS_LABELS: Record<AlertStatus, string> = {

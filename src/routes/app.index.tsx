@@ -1,15 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useProduct } from "@/lib/product-context";
-import {
-  getDemandSeries,
-  getWeeklyForecast,
-  getChannelForecast,
-} from "@/lib/mock-data";
-import {
-  buildDashboardData,
-  formatPct,
-  formatUnits,
-} from "@/lib/dashboard";
+import { getDemandSeries, getWeeklyForecast, getChannelForecast } from "@/lib/mock-data";
+import { buildDashboardData, formatPct, formatUnits } from "@/lib/dashboard";
 import { ALERT_TYPE_LABELS } from "@/lib/alerts";
 import {
   PageHeader,
@@ -54,6 +46,7 @@ import {
   LineChart as LC,
   Lightbulb,
   Handshake,
+  Factory,
   Send,
   AlertTriangle,
   ChevronRight,
@@ -67,6 +60,7 @@ const STEPS = [
   { icon: LC, label: "Baseline", done: true },
   { icon: Lightbulb, label: "Insights", done: true },
   { icon: Handshake, label: "Consenso", done: false },
+  { icon: Factory, label: "Suministro", done: false },
   { icon: Send, label: "Publicar", done: false },
 ];
 
@@ -87,10 +81,10 @@ function Dashboard() {
     };
   }, []);
 
-  const dashboard = useMemo(
-    () => buildDashboardData(product.code),
-    [product.code, insightsTick],
-  );
+  const dashboard = useMemo(() => {
+    void insightsTick;
+    return buildDashboardData(product.code);
+  }, [product.code, insightsTick]);
 
   const chartSeries = useMemo(() => {
     if (dashboard) return dashboard.chartSeries;
@@ -130,11 +124,7 @@ function Dashboard() {
   const topAlerts = productAlerts.slice(0, 3);
 
   const biasTone =
-    kpis && Math.abs(kpis.bias) > 5
-      ? "warn"
-      : kpis && kpis.bias < 0
-        ? "default"
-        : "good";
+    kpis && Math.abs(kpis.bias) > 5 ? "warn" : kpis && kpis.bias < 0 ? "default" : "good";
   const mapeTone = kpis && kpis.mape <= 10 ? "good" : kpis && kpis.mape <= 15 ? "warn" : "bad";
   const dpaTone = kpis && kpis.dpaLag3 >= 85 ? "good" : kpis && kpis.dpaLag3 >= 70 ? "warn" : "bad";
   const stockTone = kpis && kpis.stockoutRiskCount > 0 ? "warn" : "good";
@@ -170,19 +160,16 @@ function Dashboard() {
           </div>
           <div className="divide-y divide-warning/20">
             {topAlerts.map((a) => (
-              <div
-                key={a.id}
-                className="flex items-start gap-3 px-4 py-2.5 text-sm"
-              >
-                <Badge tone={a.severity === "alta" ? "bad" : a.severity === "media" ? "warn" : "info"}>
+              <div key={a.id} className="flex items-start gap-3 px-4 py-2.5 text-sm">
+                <Badge
+                  tone={a.severity === "alta" ? "bad" : a.severity === "media" ? "warn" : "info"}
+                >
                   {a.severity}
                 </Badge>
                 <div className="flex-1 min-w-0">
                   <span className="font-medium">{ALERT_TYPE_LABELS[a.type]}</span>
                   <span className="text-muted-foreground"> · {a.channel}</span>
-                  <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                    {a.message}
-                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5 truncate">{a.message}</p>
                 </div>
                 <span className="text-xs text-muted-foreground shrink-0">{a.owner}</span>
               </div>
@@ -216,11 +203,7 @@ function Dashboard() {
         <KPI
           label="Bias acumulado"
           value={kpis ? formatPct(kpis.bias) : "—"}
-          hint={
-            kpis
-              ? `Tracking Signal ${kpis.trackingSignal.toFixed(2)}`
-              : undefined
-          }
+          hint={kpis ? `Tracking Signal ${kpis.trackingSignal.toFixed(2)}` : undefined}
           tone={kpis ? biasTone : "default"}
         />
         <KPI
@@ -235,7 +218,11 @@ function Dashboard() {
         />
         <KPI
           label="Stockout Risk"
-          value={kpis ? `${kpis.stockoutRiskCount} alerta${kpis.stockoutRiskCount !== 1 ? "s" : ""}` : "—"}
+          value={
+            kpis
+              ? `${kpis.stockoutRiskCount} alerta${kpis.stockoutRiskCount !== 1 ? "s" : ""}`
+              : "—"
+          }
           tone={kpis ? stockTone : "default"}
         />
         <KPI
@@ -259,11 +246,7 @@ function Dashboard() {
                       : "bg-muted text-muted-foreground"
                   }`}
                 >
-                  {s.done ? (
-                    <CheckCircle2 className="size-4" />
-                  ) : (
-                    <Icon className="size-4" />
-                  )}
+                  {s.done ? <CheckCircle2 className="size-4" /> : <Icon className="size-4" />}
                   <span className="text-sm font-medium">{s.label}</span>
                 </div>
                 {i < STEPS.length - 1 && <div className="w-6 h-px bg-border" />}
@@ -321,8 +304,19 @@ function Dashboard() {
                 <YAxis {...CHART_AXIS} tickFormatter={(v) => Number(v).toLocaleString("es-AR")} />
                 <Tooltip content={<ChartTooltipContent />} />
                 <Legend {...CHART_LEGEND} />
-                <Bar dataKey="baseline" name="Baseline" fill={CHART_COLORS.baseline} radius={[4, 4, 0, 0]} />
-                <Bar dataKey="consenso" name="Consenso" fill={CHART_COLORS.consensus} radius={[4, 4, 0, 0]} opacity={0.85} />
+                <Bar
+                  dataKey="baseline"
+                  name="Baseline"
+                  fill={CHART_COLORS.baseline}
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  dataKey="consenso"
+                  name="Consenso"
+                  fill={CHART_COLORS.consensus}
+                  radius={[4, 4, 0, 0]}
+                  opacity={0.85}
+                />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -404,9 +398,27 @@ function Dashboard() {
 }
 
 const weeklyColumns: DataTableColumn<DashboardWeeklyRow>[] = [
-  { key: "semana", header: "Semana", sortable: true, sortValue: (r) => r.semana, render: (r) => <span className="font-medium">{r.semana}</span> },
-  { key: "real", header: "Real", sortable: true, sortValue: (r) => r.real ?? -1, render: (r) => r.real ?? "—" },
-  { key: "baseDem", header: "Demanda Base", sortable: true, sortValue: (r) => r.baseDem, render: (r) => r.baseDem.toLocaleString("es-AR") },
+  {
+    key: "semana",
+    header: "Semana",
+    sortable: true,
+    sortValue: (r) => r.semana,
+    render: (r) => <span className="font-medium">{r.semana}</span>,
+  },
+  {
+    key: "real",
+    header: "Real",
+    sortable: true,
+    sortValue: (r) => r.real ?? -1,
+    render: (r) => r.real ?? "—",
+  },
+  {
+    key: "baseDem",
+    header: "Demanda Base",
+    sortable: true,
+    sortValue: (r) => r.baseDem,
+    render: (r) => r.baseDem.toLocaleString("es-AR"),
+  },
   {
     key: "ajuste",
     header: "Ajuste insights",
@@ -414,7 +426,13 @@ const weeklyColumns: DataTableColumn<DashboardWeeklyRow>[] = [
     sortValue: (r) => r.ajuste,
     render: (r) => (r.ajuste > 0 ? `+${r.ajuste}` : r.ajuste),
   },
-  { key: "consenso", header: "Consenso", sortable: true, sortValue: (r) => r.consenso, render: (r) => <span className="font-medium">{r.consenso.toLocaleString("es-AR")}</span> },
+  {
+    key: "consenso",
+    header: "Consenso",
+    sortable: true,
+    sortValue: (r) => r.consenso,
+    render: (r) => <span className="font-medium">{r.consenso.toLocaleString("es-AR")}</span>,
+  },
   {
     key: "vsBase",
     header: "vs Base",

@@ -16,7 +16,10 @@ export type AlertType =
   | "cleaning_unclassified_outliers"
   | "cleaning_high_outlier_ratio"
   | "cleaning_coyuntural_baseline"
-  | "cleaning_unexplained_drop";
+  | "cleaning_unexplained_drop"
+  | "supply_capacity_gap"
+  | "supply_supermarket_stock_shortage"
+  | "supply_critical_stockout_risk";
 
 export interface Alert {
   id: string;

@@ -1,11 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader, Card, Badge, LockedNotice } from "@/components/ui-bits";
-import {
-  evaluateAlerts,
-  ALERT_TYPE_LABELS,
-  ALERT_STATUS_LABELS,
-  type Alert,
-} from "@/lib/alerts";
+import { evaluateAlerts, ALERT_TYPE_LABELS, ALERT_STATUS_LABELS, type Alert } from "@/lib/alerts";
 import { useEffect, useMemo, useState } from "react";
 import { CLEANING_CHANGED_EVENT } from "@/lib/cleaning";
 import { FINANCIAL_SIM_CHANGED_EVENT } from "@/lib/financial";
@@ -28,6 +23,9 @@ const REGLAS = [
   { regla: "Revenue cae vs baseline", severidad: "media", activa: true },
   { regla: "Escenario pesimista con margen negativo", severidad: "alta", activa: true },
   { regla: "SKU crítico sin insight cargado", severidad: "baja", activa: true },
+  { regla: "Forecast consenso supera capacidad productiva", severidad: "alta", activa: true },
+  { regla: "Stock insuficiente para supermercados 3 semanas", severidad: "alta", activa: true },
+  { regla: "Riesgo alto de quiebre en SKU crítico", severidad: "alta", activa: true },
 ];
 
 function severityTone(sev: Alert["severity"]): "bad" | "warn" | "info" {
@@ -64,6 +62,7 @@ function ControlTower() {
   }, []);
 
   const { alerts, evaluatedAt } = useMemo(() => {
+    void tick;
     const result = evaluateAlerts();
     return { alerts: result.alerts, evaluatedAt: result.evaluatedAt };
   }, [tick]);
@@ -157,7 +156,11 @@ function ControlTower() {
               <tr key={i} className="border-b last:border-0">
                 <td className="py-2 px-2">{r.regla}</td>
                 <td className="py-2 px-2">
-                  <Badge tone={r.severidad === "alta" ? "bad" : r.severidad === "media" ? "warn" : "info"}>
+                  <Badge
+                    tone={
+                      r.severidad === "alta" ? "bad" : r.severidad === "media" ? "warn" : "info"
+                    }
+                  >
                     {r.severidad}
                   </Badge>
                 </td>
@@ -218,7 +221,11 @@ function ControlTower() {
                 </select>
               </label>
               <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setShowForm(false)} className="h-9 px-3 rounded border">
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="h-9 px-3 rounded border"
+                >
                   Cancelar
                 </button>
                 <button className="h-9 px-3 rounded bg-nestle-red text-white">Crear</button>

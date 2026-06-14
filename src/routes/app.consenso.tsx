@@ -76,10 +76,10 @@ function Consenso() {
   } = useInsights();
 
   const bundle = useMemo(() => getSkuBundle(product.code), [product.code]);
-  const dashboard = useMemo(
-    () => buildDashboardData(product.code),
-    [product.code, insights],
-  );
+  const dashboard = useMemo(() => {
+    void insights;
+    return buildDashboardData(product.code);
+  }, [product.code, insights]);
 
   const baseline = useMemo(() => {
     if (!bundle) return 0;
@@ -87,13 +87,7 @@ function Consenso() {
   }, [bundle]);
 
   const breakdown = useMemo(
-    () =>
-      computeConsensusBreakdown(
-        baseline,
-        insights,
-        product.code,
-        product.name,
-      ),
+    () => computeConsensusBreakdown(baseline, insights, product.code, product.name),
     [baseline, insights, product.code, product.name],
   );
 
@@ -112,20 +106,15 @@ function Consenso() {
   );
 
   const skuAudit = useMemo(
-    () =>
-      auditLog.filter((a) => !a.skuCode || a.skuCode === product.code),
+    () => auditLog.filter((a) => !a.skuCode || a.skuCode === product.code),
     [auditLog, product.code],
   );
 
-  const exportCtx = useMemo(
-    () =>
-      buildForecastExportContext(
-        product.code,
-        product.name,
-        dashboard?.kpis.modelName,
-      ),
-    [product.code, product.name, dashboard?.kpis.modelName, insights, publishState],
-  );
+  const exportCtx = useMemo(() => {
+    void insights;
+    void publishState;
+    return buildForecastExportContext(product.code, product.name, dashboard?.kpis.modelName);
+  }, [product.code, product.name, dashboard?.kpis.modelName, insights, publishState]);
 
   const handleExport = (type: "csv" | "excel" | "sap" | "erp") => {
     if (!exportCtx) {
@@ -199,16 +188,14 @@ function Consenso() {
   return (
     <div>
       <PageHeader
-        title="Consenso S&OP"
+        title="Consenso"
         subtitle={`Versión activa: ${publishState?.version ?? "v3.2"} · ${product.name}`}
         actions={
           <>
             {published && (
               <Badge tone="good">
                 Publicado · {publishState?.publishedBy} ·{" "}
-                {publishState?.publishedAt
-                  ? formatAuditTime(publishState.publishedAt)
-                  : ""}
+                {publishState?.publishedAt ? formatAuditTime(publishState.publishedAt) : ""}
               </Badge>
             )}
             <button
@@ -290,9 +277,7 @@ function Consenso() {
 
       <Card title="Trazabilidad — ajustes aprobados" className="mb-6">
         {breakdown.approved.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No hay insights aprobados para este SKU.
-          </p>
+          <p className="text-sm text-muted-foreground">No hay insights aprobados para este SKU.</p>
         ) : (
           <div className="space-y-2">
             {breakdown.approved.map((ins) => {
@@ -305,11 +290,7 @@ function Consenso() {
                   <div className="flex items-center gap-3 min-w-0">
                     <Badge
                       tone={
-                        ins.area === "Marketing"
-                          ? "info"
-                          : ins.area === "Ventas"
-                            ? "good"
-                            : "warn"
+                        ins.area === "Marketing" ? "info" : ins.area === "Ventas" ? "good" : "warn"
                       }
                     >
                       {ins.area}
@@ -324,9 +305,7 @@ function Consenso() {
                       </div>
                     </div>
                   </div>
-                  <span className="text-xs text-muted-foreground shrink-0">
-                    {ins.responsable}
-                  </span>
+                  <span className="text-xs text-muted-foreground shrink-0">{ins.responsable}</span>
                 </div>
               );
             })}
@@ -340,18 +319,11 @@ function Consenso() {
         ) : (
           <div className="space-y-2">
             {breakdown.pending.map((ins) => (
-              <div
-                key={ins.id}
-                className="flex items-center justify-between p-3 rounded-md border"
-              >
+              <div key={ins.id} className="flex items-center justify-between p-3 rounded-md border">
                 <div className="flex items-center gap-3">
                   <Badge
                     tone={
-                      ins.area === "Marketing"
-                        ? "info"
-                        : ins.area === "Ventas"
-                          ? "good"
-                          : "warn"
+                      ins.area === "Marketing" ? "info" : ins.area === "Ventas" ? "good" : "warn"
                     }
                   >
                     {ins.area}
@@ -400,9 +372,7 @@ function Consenso() {
                     {published ? "Publicado" : "Borrador"}
                   </Badge>
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  Consenso con insights aprobados
-                </div>
+                <div className="text-xs text-muted-foreground">Consenso con insights aprobados</div>
                 <div className="text-xs text-muted-foreground">
                   {publishState?.publishedBy ?? "—"} ·{" "}
                   {publishState?.publishedAt
@@ -447,10 +417,7 @@ function Consenso() {
               ))}
           </div>
         </Card>
-        <Card
-          title="Audit log"
-          actions={<History className="size-4 text-muted-foreground" />}
-        >
+        <Card title="Audit log" actions={<History className="size-4 text-muted-foreground" />}>
           <div className="space-y-2 max-h-72 overflow-y-auto">
             {skuAudit.length === 0 ? (
               <p className="text-sm text-muted-foreground">Sin eventos registrados.</p>

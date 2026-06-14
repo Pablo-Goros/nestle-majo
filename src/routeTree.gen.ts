@@ -14,6 +14,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppUsuariosRouteImport } from './routes/app.usuarios'
+import { Route as AppSuministroRouteImport } from './routes/app.suministro'
 import { Route as AppMbpRouteImport } from './routes/app.mbp'
 import { Route as AppLimpiezaRouteImport } from './routes/app.limpieza'
 import { Route as AppInsightsRouteImport } from './routes/app.insights'
@@ -48,6 +49,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppUsuariosRoute = AppUsuariosRouteImport.update({
   id: '/usuarios',
   path: '/usuarios',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSuministroRoute = AppSuministroRouteImport.update({
+  id: '/suministro',
+  path: '/suministro',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMbpRoute = AppMbpRouteImport.update({
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/app/insights': typeof AppInsightsRoute
   '/app/limpieza': typeof AppLimpiezaRoute
   '/app/mbp': typeof AppMbpRoute
+  '/app/suministro': typeof AppSuministroRoute
   '/app/usuarios': typeof AppUsuariosRoute
   '/app/': typeof AppIndexRoute
 }
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/app/insights': typeof AppInsightsRoute
   '/app/limpieza': typeof AppLimpiezaRoute
   '/app/mbp': typeof AppMbpRoute
+  '/app/suministro': typeof AppSuministroRoute
   '/app/usuarios': typeof AppUsuariosRoute
   '/app': typeof AppIndexRoute
 }
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/app/insights': typeof AppInsightsRoute
   '/app/limpieza': typeof AppLimpiezaRoute
   '/app/mbp': typeof AppMbpRoute
+  '/app/suministro': typeof AppSuministroRoute
   '/app/usuarios': typeof AppUsuariosRoute
   '/app/': typeof AppIndexRoute
 }
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/app/insights'
     | '/app/limpieza'
     | '/app/mbp'
+    | '/app/suministro'
     | '/app/usuarios'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/app/insights'
     | '/app/limpieza'
     | '/app/mbp'
+    | '/app/suministro'
     | '/app/usuarios'
     | '/app'
   id:
@@ -201,6 +212,7 @@ export interface FileRouteTypes {
     | '/app/insights'
     | '/app/limpieza'
     | '/app/mbp'
+    | '/app/suministro'
     | '/app/usuarios'
     | '/app/'
   fileRoutesById: FileRoutesById
@@ -246,6 +258,13 @@ declare module '@tanstack/react-router' {
       path: '/usuarios'
       fullPath: '/app/usuarios'
       preLoaderRoute: typeof AppUsuariosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/suministro': {
+      id: '/app/suministro'
+      path: '/suministro'
+      fullPath: '/app/suministro'
+      preLoaderRoute: typeof AppSuministroRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/mbp': {
@@ -332,6 +351,7 @@ interface AppRouteChildren {
   AppInsightsRoute: typeof AppInsightsRoute
   AppLimpiezaRoute: typeof AppLimpiezaRoute
   AppMbpRoute: typeof AppMbpRoute
+  AppSuministroRoute: typeof AppSuministroRoute
   AppUsuariosRoute: typeof AppUsuariosRoute
   AppIndexRoute: typeof AppIndexRoute
 }
@@ -347,6 +367,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppInsightsRoute: AppInsightsRoute,
   AppLimpiezaRoute: AppLimpiezaRoute,
   AppMbpRoute: AppMbpRoute,
+  AppSuministroRoute: AppSuministroRoute,
   AppUsuariosRoute: AppUsuariosRoute,
   AppIndexRoute: AppIndexRoute,
 }
